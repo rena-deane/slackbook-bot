@@ -1,2 +1,3 @@
-# slackbook-bot
-Slackbot that tells me about what's happening on Facebook
+# Slackbro - a slackbot that looks up maori words and translates them to english
+
+Based on [Botkit](http://howdy.ai/botkit) - Building Blocks for Building Bots.
