@@ -5,64 +5,7 @@ ______     ______     ______   __  __     __     ______
 \ \_____\  \ \_____\    \ \_\  \ \_\ \_\  \ \_\    \ \_\
 \/_____/   \/_____/     \/_/   \/_/\/_/   \/_/     \/_/
 
-
-This is a sample Slack bot built with Botkit.
-
-This bot demonstrates many of the core features of Botkit:
-
-* Connect to Slack using the real time API
-* Receive messages based on "spoken" patterns
-* Reply to messages
-* Use the conversation system to ask questions
-* Use the built in storage system to store and retrieve information
-for a user.
-
-# RUN THE BOT:
-
-Get a Bot token from Slack:
-
--> http://my.slack.com/services/new/bot
-
-Run your bot from the command line:
-
-token=<MY TOKEN> node slack_bot.js
-
-# USE THE BOT:
-
-Find your bot inside Slack to send it a direct message.
-
-Say: "Hello"
-
-The bot will reply "Hello!"
-
-Say: "who are you?"
-
-The bot will tell you its name, where it is running, and for how long.
-
-Say: "Call me <nickname>"
-
-Tell the bot your nickname. Now you are friends.
-
-Say: "who am I?"
-
-The bot will tell you your nickname, if it knows one for you.
-
-Say: "shutdown"
-
-The bot will ask if you are sure, and then shut itself down.
-
-Make sure to invite your bot into other channels using /invite @<my bot>!
-
-# EXTEND THE BOT:
-
-Botkit has many features for building cool and useful bots!
-
-Read all about it here:
-
--> http://howdy.ai/botkit
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-var request = require('superagent')
 
 if (!process.env.token) {
   console.log('Error: Specify token in environment');
@@ -71,6 +14,7 @@ if (!process.env.token) {
 
 var Botkit = require('./lib/Botkit.js');
 var os = require('os');
+var request = require('superagent')
 
 var controller = Botkit.slackbot({
   debug: true
@@ -103,93 +47,10 @@ controller.hears(['hello', 'hi', 'Kia ora'], 'direct_message,direct_mention,ment
   });
 });
 
-controller.hears(['call me (.*)', 'my name is (.*)', 'ko (.*) toku ingoa'], 'direct_message,direct_mention,mention', function(bot, message) {
-  var name = message.match[1];
-  controller.storage.users.get(message.user, function(err, user) {
-    if (!user) {
-      user = {
-        id: message.user,
-      };
-    }
-    user.name = name;
-    controller.storage.users.save(user, function(err, id) {
-      bot.reply(message, 'Got it. I will call you ' + user.name + ' from now on.  Nga mihi ' + user.name);
-    });
-  });
-});
 
-controller.hears(['what is my name', 'who am i', 'ko wai au'], 'direct_message,direct_mention,mention', function(bot, message) {
-
-  controller.storage.users.get(message.user, function(err, user) {
-    if (user && user.name) {
-      bot.reply(message, 'Your name is ' + user.name);
-    } else if (user && user.name && message.match[3]) {
-      bot.reply(message, 'Ko ' + user.name + 'to ingoa');
-    } else {
-      bot.startConversation(message, function(err, convo) {
-        if (!err) {
-          convo.say('I do not know your name yet!');
-          convo.ask('What should I call you?', function(response, convo) {
-            convo.ask('You want me to call you `' + response.text + '`?', [
-              {
-                pattern: 'yes',
-                callback: function(response, convo) {
-                  // since no further messages are queued after this,
-                  // the conversation will end naturally with status == 'completed'
-                  convo.next();
-                }
-              },
-              {
-                pattern: 'no',
-                callback: function(response, convo) {
-                  // stop the conversation. this will cause it to end with status == 'stopped'
-                  convo.stop();
-                }
-              },
-              {
-                default: true,
-                callback: function(response, convo) {
-                  convo.repeat();
-                  convo.next();
-                }
-              }
-            ]);
-
-            convo.next();
-
-          }, {'key': 'nickname'}); // store the results in a field called nickname
-
-          convo.on('end', function(convo) {
-            if (convo.status == 'completed') {
-              bot.reply(message, 'OK! I will update my dossier...');
-
-              controller.storage.users.get(message.user, function(err, user) {
-                if (!user) {
-                  user = {
-                    id: message.user,
-                  };
-                }
-                user.name = convo.extractResponse('nickname');
-                controller.storage.users.save(user, function(err, id) {
-                  bot.reply(message, 'Got it. I will call you ' + user.name + ' from now on.');
-                });
-              });
-
-
-
-            } else {
-              // this happens if the conversation ended prematurely for some reason
-              bot.reply(message, 'OK, nevermind!');
-            }
-          });
-        }
-      });
-    }
-  });
-});
 
 // Hit API
-controller.hears(['korero maori', 'korero Maori'], 'direct_message,direct_mention,mention', function(bot, message) {
+controller.hears(['whakamaori'], 'direct_message,direct_mention,mention', function(bot, message) {
 
   controller.storage.users.get(message.user, function(err, user) {
     bot.startConversation(message, function(err, convo) {
@@ -199,7 +60,7 @@ controller.hears(['korero maori', 'korero Maori'], 'direct_message,direct_mentio
             {
               pattern: 'ae',
               callback: function(response, convo) {
-                convo.say('Nga mihi')
+                convo.say('Maku e kimi i te Reo')
                 convo.next();
               }
             },
@@ -221,34 +82,38 @@ controller.hears(['korero maori', 'korero Maori'], 'direct_message,direct_mentio
 
           convo.next();
 
-        }, {'key': 'nickname'}); // store the results in a field called nickname
+        }, {'key': 'word'}); // store the results in a field called nickname
 
         convo.on('end', function(convo) {
           if (convo.status == 'completed') {
-            bot.reply(message, 'OK! Me whakatika au i au ano!');
-
             controller.storage.users.get(message.user, function(err, user) {
               if (!user) {
                 user = {
                   id: message.user,
                 };
               }
-              user.name = convo.extractResponse('nickname');
+              user.name = convo.extractResponse('word');
               controller.storage.users.save(user, function(err, id) {
-                bot.reply(message, 'Tangata ako ana i te teihana, te turanga ki Slack whānui, tau ana');
+                request.get('https://test-papakupu.herokuapp.com/v1/translations/1.1')
+                  .then((data) => {
+                    var english = JSON.parse(data.body[0])
+                    bot.reply(message, 'word is: ' + english);
+                    console.log('api stuff here: ', english);
+                  })
+                  .catch((err) => {
+                    bot.reply(message, 'Sorry I could not find a transalation for ' + word);
+                  })
               });
             });
 
-
-
           } else {
             // this happens if the conversation ended prematurely for some reason
-            bot.reply(message, 'Kei te pai!');
+            bot.reply(message, 'Another time then :robot_face:');
           }
         });
       }
     });
-  }
+  })
 });
 
 
@@ -280,7 +145,7 @@ controller.hears(['shutdown', 'goodnight'], 'direct_message,direct_mention,menti
 });
 
 
-controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'],
+controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name', 'ko wai koe'],
 'direct_message,direct_mention,mention', function(bot, message) {
 
   var hostname = os.hostname();
