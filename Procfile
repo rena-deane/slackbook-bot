@@ -1,1 +1,1 @@
-node slackbook-bot
+TOKEN=process.env.TOKEN node slackbook-bot
