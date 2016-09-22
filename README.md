@@ -1,10 +1,10 @@
 # Slackbro
 
-- A slackbot that takes an english word and translates it in to Māori.  And vice versa.
+- A slackbot that takes an english word and translates it in to Māori.
 - Based on [Botkit](http://howdy.ai/botkit) - Building Blocks for Building Bots.
 
 ##Keretao (Maori word for Robot)
-Direct message the bot for your translation.
+Direct message the bot for your translation or invite it to your channel.
 
 ###Maori to English
 
