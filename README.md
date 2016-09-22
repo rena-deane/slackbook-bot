@@ -17,4 +17,4 @@ which mean _"translate to Māori"_
 - You will then confirm with him by replying `ae` meaning _yes_ or `kao`for _no_
 - Keretao with then return the Māori word with a Māori sentence using the word and the english translation of that sentence.
 
-![alt text](images/maori-translation.png "Whakawhitiwhiti korero ki a Keretao")
+![alt text](./maori-translation.png "Whakawhitiwhiti korero ki a Keretao")
